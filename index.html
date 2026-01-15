@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badminton Pair Poll</title>
+
+<!-- html2canvas for screenshot/share -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+    body {
+        width: 100%;
+        max-width: 420px;
+        margin: auto;
+        padding: 15px;
+        font-family: system-ui, Arial, sans-serif;
+        background: #f2f4f7;
+        box-sizing: border-box;
+    }
+    h1 {
+        text-align: center;
+        font-size: 22px;
+        margin-bottom: 16px;
+    }
+    input, button {
+        width: 100%;
+        padding: 14px;
+        font-size: 18px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+    button {
+        background: #1e88e5;
+        color: white;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
+    button.secondary { background: #757575; }
+    button.share { background: #2e7d32; }
+    input:focus { outline: 2px solid #1e88e5; }
+    #count { text-align: center; font-weight: bold; margin-top: 12px; }
+    .pair {
+        background: white;
+        padding: 14px;
+        margin-top: 12px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .pair-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-align: center;
+        word-break: break-word;
+    }
+    .vote-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .votes { font-size: 18px; font-weight: bold; }
+    @media (max-width: 360px) {
+        .vote-row { flex-direction: column; align-items: stretch; }
+    }
+</style>
+</head>
+<body>
+
+<h1>🏸 Badminton Pair Voting</h1>
+
+<input id="playerInput" placeholder="Enter player name">
+<button onclick="addPlayer()">Add Player</button>
+
+<p id="count">Players: 0 / 16</p>
+
+<button onclick="generatePairs()">🎲 Generate 8 Pairs</button>
+<button class="secondary" onclick="resetAll()">Reset</button>
+<button class="share" onclick="shareResults()">📸 Share Results</button>
+
+<div id="pairs"></div>
+
+<script>
+let players = [];
+let pairs = [];
+
+function addPlayer() {
+    if (players.length >= 16) { alert("Only 16 players allowed!"); return; }
+    const input = document.getElementById("playerInput");
+    const name = input.value.trim();
+    if (name) { players.push(name); input.value = ""; updateCount(); }
+}
+
+function updateCount() {
+    document.getElementById("count").innerText = `Players: ${players.length} / 16`;
+}
+
+function resetAll() {
+    players = [];
+    pairs = [];
+    document.getElementById("pairs").innerHTML = "";
+    updateCount();
+}
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+}
+
+function generatePairs() {
+    if (players.length !== 16) { alert("Please add exactly 16 players"); return; }
+    shuffle(players);
+    pairs = [];
+    for (let i = 0; i < 16; i += 2) {
+        pairs.push({ name: `${players[i]} & ${players[i+1]}`, votes: 0 });
+    }
+    renderPairs();
+}
+
+function vote(index) { pairs[index].votes++; renderPairs(); }
+
+function renderPairs() {
+    const container = document.getElementById("pairs");
+    container.innerHTML = "";
+    pairs.forEach((pair, index) => {
+        const pairDiv = document.createElement("div");
+        pairDiv.className = "pair";
+        pairDiv.innerHTML = `
+            <div class="pair-name">${pair.name}</div>
+            <div class="vote-row">
+                <div class="votes">Votes: ${pair.votes}</div>
+                <button onclick="vote(${index})">👍 Vote</button>
+            </div>
+        `;
+        container.appendChild(pairDiv);
+    });
+}
+
+function shareResults() {
+    if (pairs.length === 0) { alert("No results to share!"); return; }
+    html2canvas(document.body).then(canvas => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "badminton-results.png", { type: "image/png" });
+            try {
+                if (navigator.share && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        title: "Badminton Pair Results",
+                        text: "🏸 Badminton Pair Voting Results",
+                        files: [file]
+                    });
+                } else {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(file);
+                    a.download = "badminton-results.png";
+                    a.click();
+                }
+            } catch (err) { alert("Sharing not supported on this device"); }
+        });
+    });
+}
+</script>
+
+</body>
+</html>
