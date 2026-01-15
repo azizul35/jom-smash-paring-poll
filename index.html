@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Badminton Pair Poll</title>
+<title>Jom Smash Pair Poll</title>
 
 <!-- html2canvas for screenshot/share -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -73,7 +73,7 @@
 </head>
 <body>
 
-<h1>🏸 Badminton Pair Voting</h1>
+<h1>🏸 Jom Smash Pair Voting</h1>
 
 <input id="playerInput" placeholder="Enter player name">
 <button onclick="addPlayer()">Add Player</button>
@@ -148,18 +148,18 @@ function shareResults() {
     if (pairs.length === 0) { alert("No results to share!"); return; }
     html2canvas(document.body).then(canvas => {
         canvas.toBlob(blob => {
-            const file = new File([blob], "badminton-results.png", { type: "image/png" });
+            const file = new File([blob], "Jom Smash-results.png", { type: "image/png" });
             try {
                 if (navigator.share && navigator.canShare({ files: [file] })) {
                     navigator.share({
-                        title: "Badminton Pair Results",
-                        text: "🏸 Badminton Pair Voting Results",
+                        title: "Jom Smash Pair Results",
+                        text: "🏸 Jom Smash Pair Voting Results",
                         files: [file]
                     });
                 } else {
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(file);
-                    a.download = "badminton-results.png";
+                    a.download = "Jom Smash-results.png";
                     a.click();
                 }
             } catch (err) { alert("Sharing not supported on this device"); }
@@ -170,3 +170,4 @@ function shareResults() {
 
 </body>
 </html>
+
